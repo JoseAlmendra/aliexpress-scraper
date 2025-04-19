@@ -68,9 +68,20 @@ async function scrapeOrderDetails(url) {
         const productName = productNameElement?.innerText?.trim() || 'No product name found';
         console.log('LOG: productName encontrado:', productName);
 
-        const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass .es--wrap--1Hlfkoj');
-        const totalPrice = totalPriceElement?.innerText?.trim() || 'No total price found';
-        console.log('LOG: totalPrice encontrado:', totalPrice);
+        // Precio total (maneja el caso de spans individuales)
+    let totalPrice = 'No total price found';
+    const totalPriceContainer = document.querySelector('.order-price .order-price-item .rightPriceClass .es--wrap--1Hlfkoj');
+    if (totalPriceContainer) {
+      totalPrice = Array.from(totalPriceContainer.children)
+        .map(span => span.innerText)
+        .join('');
+      totalPrice = totalPriceContainer.innerText; // Intenta con el texto del contenedor también como respaldo
+      console.log('LOG: totalPrice extraído (con spans):', totalPrice);
+    } else {
+      const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass');
+      totalPrice = totalPriceElement?.innerText?.trim() || 'No total price found';
+      console.log('LOG: totalPrice extraído (sin spans):', totalPrice);
+    }
 
         const html = document.body.innerHTML;
         console.log('LOG: HTML del body extraído.');
