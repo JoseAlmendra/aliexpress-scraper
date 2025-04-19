@@ -28,10 +28,32 @@ async function scrapeOrderDetails(url) {
 
     // Extraer los detalles del pedido
     const orderDetails = await page.evaluate(() => {
-      const orderNumber = document.querySelector('.order-number-class')?.innerText || 'No order number found';
-      const productName = document.querySelector('.product-name-class')?.innerText || 'No product name found';
-      const price = document.querySelector('.price-class')?.innerText || 'No price found';
-      return { orderNumber, productName, price };
+      const orderNumberElement = document.querySelector('.order-detail-info-item.order-detail-order-info .info-row:first-child > span:nth-child(2)');
+      const orderNumber = orderNumberElement?.innerText.replace('Nº de pedido:\u00A0', '') || 'No order number found';
+
+      const orderDateElement = document.querySelector('.order-detail-info-item.order-detail-order-info .info-row:nth-child(2) > span:nth-child(2)');
+      const orderDate = orderDateElement?.innerText.replace('Pedido efectuado el:\u00A0', '') || 'No order date found';
+
+      const storeNameElement = document.querySelector('.order-detail-item-store .store-name');
+      const storeName = storeNameElement?.innerText.trim() || 'No store name found';
+
+      const productImageElement = document.querySelector('.order-detail-item-content-img');
+      const productImage = productImageElement?.style.backgroundImage.slice(4, -2).replace(/_220x220\.jpg/, '') || 'No product image found';
+
+      const productNameElement = document.querySelector('.order-detail-item-content-info .item-title a');
+      const productName = productNameElement?.innerText.trim() || 'No product name found';
+
+      const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass .es--wrap--1Hlfkoj');
+      const totalPrice = totalPriceElement?.innerText.trim() || 'No total price found';
+
+      return {
+        orderNumber,
+        orderDate,
+        storeName,
+        productImage,
+        productName,
+        totalPrice
+      };
     });
 
     await browser.close();
