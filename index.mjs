@@ -11,7 +11,10 @@ const cookies = JSON.parse(fs.readFileSync('./cookies.json', 'utf-8'));
 // Función para hacer scraping de los detalles del pedido
 async function scrapeOrderDetails(url) {
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true, // Si no quieres que el navegador sea visible
+      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Esto resuelve el problema de root
+    });
     const page = await browser.newPage();
 
     // Cargar las cookies para mantener la sesión activa
