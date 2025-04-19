@@ -36,15 +36,19 @@ async function scrapeOrderDetails(url) {
 
       const orderInfoBlock = document.querySelector('.order-detail-info-item.order-detail-order-info');
 
-      // Número de pedido
+      // Diagnóstico del número de pedido
       const orderNumberElement = orderInfoBlock?.querySelector('.info-row:first-child > span:nth-child(2)');
-      const orderNumber = orderNumberElement?.innerText.replace('Nº de pedido:\u00A0', '').trim() || 'No order number found';
-      console.log('LOG: orderNumber encontrado:', orderNumber);
+      const orderNumberText = orderNumberElement?.innerText;
+      console.log('LOG: Texto encontrado para orderNumber:', orderNumberText);
+      const orderNumber = orderNumberText?.replace('Nº de pedido:\u00A0', '').trim() || 'No order number found';
+      console.log('LOG: orderNumber extraído:', orderNumber);
 
-      // Fecha del pedido
+      // Diagnóstico de la fecha del pedido
       const orderDateElement = orderInfoBlock?.querySelector('.info-row:nth-child(2) > span:nth-child(2)');
-      const orderDate = orderDateElement?.innerText.replace('Pedido efectuado el:\u00A0', '').trim() || 'No order date found';
-      console.log('LOG: orderDate encontrado:', orderDate);
+      const orderDateText = orderDateElement?.innerText;
+      console.log('LOG: Texto encontrado para orderDate:', orderDateText);
+      const orderDate = orderDateText?.replace('Pedido efectuado el:\u00A0', '').trim() || 'No order date found';
+      console.log('LOG: orderDate extraído:', orderDate);
 
       const storeNameElement = document.querySelector('.order-detail-item-store .store-name');
       const storeName = storeNameElement?.innerText.trim() || 'No store name found';
