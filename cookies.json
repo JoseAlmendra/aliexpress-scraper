@@ -1,47 +1,53 @@
 [
-  {
-    "name": "xman_us_f",
-    "value": "x_locale=es_ES&x_l=0&x_user=MX|jose|el%20pitillo%20feliz|ifm|928708417&x_lid=mx1309651240fmcs&x_c_chg=0&x_as_i=%7B%22aeuCID%22%3A%222629ef8711cc4658a02f9b33114c490e-1744868748236-05533-_rQeIVp%22%2C%22affiliateKey%22%3A%22_rQeIVp%22%2C%22channel%22%3A%22AFFILIATE%22%2C%22cv%22%3A%221%22%2C%22isCookieCache%22%3A%22N%22%2C%22ms%22%3A%221%22%2C%22pid%22%3A%222387104769%22%2C%22tagtime%22%3A1744868748236%7D&acs_rt=d99462fc29104a1198ea2845492c5548",
-    "domain": ".aliexpress.com",
-    "path": "/"
-  },
-  {
-    "name": "xman_us_t",
-    "value": "x_lid=mx1309651240fmcs&sign=y&rmb_pp=52-9982928426&x_user=GNbwDhmJIR6ZzhJjhttObhs9HCSUTGjQkl68NRYK4YU=&ctoken=uh1i98yu9l93&l_source=aliexpress",
-    "domain": ".aliexpress.com",
-    "path": "/"
-  },
-  {
-    "name": "ali_apache_id",
-    "value": "33.3.32.82.1734977504575.139826.1",
-    "domain": ".aliexpress.com",
-    "path": "/"
-  },
-  {
-    "name": "ali_apache_track",
-    "value": "mt=1|mid=mx1309651240fmcs",
-    "domain": ".aliexpress.com",
-    "path": "/"
-  },
-  {
-    "name": "xman_f",
-    "value": "1F+4RvPVa+prX1UQdFyY1oM/btSGH0flJEq5Vi6iuWaXuh0CnLkC9PMBBRTyEQeVwdpV3ie0o73VgcPt59vQKVfz8xzGurT3rBjbMTI2xzVJx6wcGLXPOm2qxzh4D7OB0vRXKvpEatxUkeBVa/26CneTqwXAvEheGaBZnC/SKZoIFOOVktyXueyO8etlh49SMNQQZ4f5jEEqDGMdzXon9mUsA8uC2wRnjJwmUYSzDYqmOR5ouRP3Cyyq6u98oeW8ZYdOPPwV9G+w/ifDXGU0ojYUJfj2udoEuXJb7tfShUJEQS3Y8/3eWTaTFDCRukMHrwlqkNiVktGcyJzwQ4UGq9gozXs0loDHbbNDHcnOSTlqxEfNFObYZKHjehBsm5SBf59MFsX4ezC6hLGoMywkJo53lALX04vRR2LM22d9+Hk=",
-    "domain": ".aliexpress.com",
-    "path": "/",
-    "httpOnly": true,
-    "secure": true
-  },
-  {
-    "name": "intl_locale",
-    "value": "es_ES",
-    "domain": ".aliexpress.com",
-    "path": "/"
-  },
-  {
-    "name": "acs_usuc_t",
-    "value": "x_csrf=110qjzbhvhd_p&acs_rt=f10872ed01b14e03aad8553f6a81bf04",
-    "domain": ".aliexpress.com",
-    "path": "/",
-    "httpOnly": true
-  }
-]
+    {
+        "domain": ".aliexpress.com",
+        "expirationDate": 1776558002,
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "aep_history",
+        "path": "/",
+        "sameSite": null,
+        "secure": false,
+        "session": false,
+        "storeId": null,
+        "value": "keywords%5E%0Akeywords%09%0A%0Aproduct_selloffer%5E%0Aproduct_selloffer%0932998520808%091005008543751418%091005007822121299%091005007846811660%091005006043947874%091005008524511384%091005007207885906%094001027622506"
+    },
+    {
+        "domain": ".aliexpress.com",
+        "expirationDate": 1752795321.370171,
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "xman_us_t",
+        "path": "/",
+        "sameSite": "no_restriction",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "x_lid=mx1309651240fmcs&sign=y&rmb_pp=52-9982928426&x_user=GNbwDhmJIR6ZzhJjhttObhs9HCSUTGjQkl68NRYK4YU=&ctoken=uh1i98yu9l93&l_source=aliexpress"
+    },
+    {
+        "domain": ".aliexpress.com",
+        "expirationDate": 1779429007.33719,
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "__utma",
+        "path": "/",
+        "sameSite": null,
+        "secure": false,
+        "session": false,
+        "storeId": null,
+        "value": "3375712.152243559.1734952812.1744833995.1744868772.25"
+    },
+    {
+        "domain": "www.aliexpress.com",
+        "expirationDate": 1776558184,
+        "hostOnly": true,
+        "httpOnly": false,
+        "name": "__rtbh.lid",
+        "path": "/",
+        "sameSite": "no_restriction",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "%7B%22eventType%22%3A%22lid%22%2C%22id%22%3A%22LJKVPWF443NrBK8H4n3E%22%2C%22expiryDate%22%3A%222026-04-19T00%3A23%3A04.015Z%22%7D"
+    },
