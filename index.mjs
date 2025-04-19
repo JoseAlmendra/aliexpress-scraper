@@ -32,29 +32,29 @@ async function scrapeOrderDetails(url) {
     await new Promise(resolve => setTimeout(resolve, 3000));
     console.log('LOG: Espera adicional de 3 segundos completada (con setTimeout).');
 
-    const orderDetails = await page.evaluate(() => {
+    const extractionResult = await page.evaluate(() => {
       console.log('LOG: Dentro de page.evaluate().');
       try {
         const orderInfoBlock = document.querySelector('.order-detail-info-item.order-detail-order-info .order-detail-info-content');
         console.log('LOG: orderInfoBlock encontrado:', !!orderInfoBlock);
 
         // Número de pedido
-    let orderNumber = 'No order number found';
-    const orderIdLabel = orderInfoBlock?.querySelector('.info-row:first-child > span[data-pl="order_detail_gray_id"]');
-    console.log('LOG: orderIdLabel encontrado:', !!orderIdLabel, 'Texto:', orderIdLabel?.textContent);
-    if (orderIdLabel?.textContent?.includes('Order ID:')) {
-      orderNumber = orderIdLabel.nextSibling?.textContent?.trim();
-      console.log('LOG: orderNumber extraído:', orderNumber);
-    }
+        let orderNumber = 'No order number found';
+        const orderIdLabel = orderInfoBlock?.querySelector('.info-row:first-child > span[data-pl="order_detail_gray_id"]');
+        console.log('LOG: orderIdLabel encontrado:', !!orderIdLabel, 'Texto:', orderIdLabel?.textContent);
+        if (orderIdLabel?.textContent?.includes('Order ID:')) {
+          orderNumber = orderIdLabel.nextSibling?.textContent?.trim();
+          console.log('LOG: orderNumber extraído:', orderNumber);
+        }
 
-    // Fecha del pedido
-    let orderDate = 'No order date found';
-    const orderDateLabel = orderInfoBlock?.querySelector('.info-row:nth-child(2) > span[data-pl="order_detail_gray_date"]');
-    console.log('LOG: orderDateLabel encontrado:', !!orderDateLabel, 'Texto:', orderDateLabel?.textContent);
-    if (orderDateLabel?.textContent?.includes('Order placed on:')) {
-      orderDate = orderDateLabel.nextSibling?.textContent?.trim();
-      console.log('LOG: orderDate extraído:', orderDate);
-    }
+        // Fecha del pedido
+        let orderDate = 'No order date found';
+        const orderDateLabel = orderInfoBlock?.querySelector('.info-row:nth-child(2) > span[data-pl="order_detail_gray_date"]');
+        console.log('LOG: orderDateLabel encontrado:', !!orderDateLabel, 'Texto:', orderDateLabel?.textContent);
+        if (orderDateLabel?.textContent?.includes('Order placed on:')) {
+          orderDate = orderDateLabel.nextSibling?.textContent?.trim();
+          console.log('LOG: orderDate extraído:', orderDate);
+        }
 
         const storeNameElement = document.querySelector('.order-detail-item-store .store-name');
         const storeName = storeNameElement?.innerText?.trim() || 'No store name found';
@@ -72,6 +72,9 @@ async function scrapeOrderDetails(url) {
         const totalPrice = totalPriceElement?.innerText?.trim() || 'No total price found';
         console.log('LOG: totalPrice encontrado:', totalPrice);
 
+        const html = document.body.innerHTML;
+        console.log('LOG: HTML del body extraído.');
+
         const extractedData = {
           orderNumber,
           orderDate,
@@ -81,24 +84,27 @@ async function scrapeOrderDetails(url) {
           totalPrice
         };
         console.log('LOG: Datos extraídos dentro de evaluate:', extractedData);
-        return extractedData;
+        return { data: extractedData, html };
       } catch (error) {
         console.error('LOG: Error dentro de page.evaluate():', error);
         return {
-          orderNumber: 'Error during extraction',
-          orderDate: 'Error during extraction',
-          storeName: 'Error during extraction',
-          productImage: 'Error during extraction',
-          productName: 'Error during extraction',
-          totalPrice: 'Error during extraction'
+          data: {
+            orderNumber: 'Error during extraction',
+            orderDate: 'Error during extraction',
+            storeName: 'Error during extraction',
+            productImage: 'Error during extraction',
+            productName: 'Error during extraction',
+            totalPrice: 'Error during extraction'
+          },
+          html: 'Error during HTML extraction'
         };
       }
     });
 
     await browser.close();
     console.log('LOG: Navegador cerrado.');
-    console.log('LOG: Datos finales a retornar:', orderDetails);
-    return orderDetails;
+    console.log('LOG: Datos finales a retornar:', extractionResult.data);
+    return { ...extractionResult.data, html: extractionResult.html };
 
   } catch (err) {
     console.error('LOG: Error durante el scraping:', err);
@@ -114,8 +120,8 @@ app.post('/', async (req, res) => {
   }
 
   try {
-    const data = await scrapeOrderDetails(url);
-    res.json(data); // Devuelve los detalles del pedido
+    const dataWithHtml = await scrapeOrderDetails(url);
+    res.json(dataWithHtml); // Devuelve los detalles del pedido y el HTML
   } catch (error) {
     res.status(500).json({ status: 'error', message: 'Algo salió mal al procesar la solicitud' });
   }
