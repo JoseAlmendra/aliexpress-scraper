@@ -36,19 +36,21 @@ async function scrapeOrderDetails(url) {
 
       const orderInfoBlock = document.querySelector('.order-detail-info-item.order-detail-order-info');
 
-      // Diagnóstico del número de pedido
-      const orderNumberElement = orderInfoBlock?.querySelector('.info-row:first-child > span:nth-child(2)');
-      const orderNumberText = orderNumberElement?.innerText;
-      console.log('LOG: Texto encontrado para orderNumber:', orderNumberText);
-      const orderNumber = orderNumberText?.replace('Nº de pedido:\u00A0', '').trim() || 'No order number found';
-      console.log('LOG: orderNumber extraído:', orderNumber);
+      // Número de pedido (buscando el span con el texto)
+  let orderNumber = 'No order number found';
+  const orderNumberLabel = orderInfoBlock?.querySelector('.info-row > span[data-pl="order_detail_gray_id"]');
+  if (orderNumberLabel?.textContent.includes('Nº de pedido:')) {
+    orderNumber = orderNumberLabel.nextElementSibling?.textContent?.trim() || 'No order number found';
+  }
+  console.log('LOG: orderNumber extraído (refinado):', orderNumber);
 
-      // Diagnóstico de la fecha del pedido
-      const orderDateElement = orderInfoBlock?.querySelector('.info-row:nth-child(2) > span:nth-child(2)');
-      const orderDateText = orderDateElement?.innerText;
-      console.log('LOG: Texto encontrado para orderDate:', orderDateText);
-      const orderDate = orderDateText?.replace('Pedido efectuado el:\u00A0', '').trim() || 'No order date found';
-      console.log('LOG: orderDate extraído:', orderDate);
+  // Fecha del pedido (buscando el span con el texto)
+  let orderDate = 'No order date found';
+  const orderDateLabel = orderInfoBlock?.querySelector('.info-row > span[data-pl="order_detail_gray_date"]');
+  if (orderDateLabel?.textContent.includes('Pedido efectuado el:')) {
+    orderDate = orderDateLabel.nextElementSibling?.textContent?.trim() || 'No order date found';
+  }
+  console.log('LOG: orderDate extraído (refinado):', orderDate);
 
       const storeNameElement = document.querySelector('.order-detail-item-store .store-name');
       const storeName = storeNameElement?.innerText.trim() || 'No store name found';
