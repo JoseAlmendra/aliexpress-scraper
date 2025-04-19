@@ -86,9 +86,6 @@ async function scrapeOrderDetails(url) {
           console.log('LOG: totalPrice extraído (sin spans):', totalPrice);
         }
 
-        const html = document.body.innerHTML;
-        console.log('LOG: HTML del body extraído.');
-
         const extractedData = {
           orderNumber,
           orderDate,
@@ -98,7 +95,7 @@ async function scrapeOrderDetails(url) {
           totalPrice
         };
         console.log('LOG: Datos extraídos dentro de evaluate:', extractedData);
-        return { data: extractedData, html };
+        return { data: extractedData};
       } catch (error) {
         console.error('LOG: Error dentro de page.evaluate():', error);
         return {
