@@ -17,36 +17,46 @@ async function scrapeOrderDetails(url) {
     });
     const page = await browser.newPage();
 
-    // Filtrar las cookies que tienen sameSite como null
     const validCookies = cookies.filter(cookie => cookie.sameSite !== null);
-
-    // Cargar las cookies válidas para mantener la sesión activa
     await page.setCookie(...validCookies);
+    console.log('LOG: Cookies establecidas.');
 
-    // Navegar al URL del pedido
+    console.log(`LOG: Navegando a la URL: ${url}`);
     await page.goto(url, { waitUntil: 'domcontentloaded' });
+    console.log('LOG: Navegación completada (domcontentloaded).');
 
-    // Extraer los detalles del pedido
+    // Esperar un poco más por si acaso hay carga dinámica
+    await page.waitForTimeout(3000); // Espera 3 segundos
+    console.log('LOG: Espera adicional de 3 segundos completada.');
+
     const orderDetails = await page.evaluate(() => {
+      console.log('LOG: Dentro de page.evaluate().');
+
       const orderNumberElement = document.querySelector('.order-detail-info-item.order-detail-order-info .info-row:first-child > span:nth-child(2)');
       const orderNumber = orderNumberElement?.innerText.replace('Nº de pedido:\u00A0', '') || 'No order number found';
+      console.log('LOG: orderNumber encontrado:', orderNumber);
 
       const orderDateElement = document.querySelector('.order-detail-info-item.order-detail-order-info .info-row:nth-child(2) > span:nth-child(2)');
       const orderDate = orderDateElement?.innerText.replace('Pedido efectuado el:\u00A0', '') || 'No order date found';
+      console.log('LOG: orderDate encontrado:', orderDate);
 
       const storeNameElement = document.querySelector('.order-detail-item-store .store-name');
       const storeName = storeNameElement?.innerText.trim() || 'No store name found';
+      console.log('LOG: storeName encontrado:', storeName);
 
       const productImageElement = document.querySelector('.order-detail-item-content-img');
       const productImage = productImageElement?.style.backgroundImage.slice(4, -2).replace(/_220x220\.jpg/, '') || 'No product image found';
+      console.log('LOG: productImage encontrado:', productImage);
 
       const productNameElement = document.querySelector('.order-detail-item-content-info .item-title a');
       const productName = productNameElement?.innerText.trim() || 'No product name found';
+      console.log('LOG: productName encontrado:', productName);
 
       const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass .es--wrap--1Hlfkoj');
       const totalPrice = totalPriceElement?.innerText.trim() || 'No total price found';
+      console.log('LOG: totalPrice encontrado:', totalPrice);
 
-      return {
+      const extractedData = {
         orderNumber,
         orderDate,
         storeName,
@@ -54,13 +64,17 @@ async function scrapeOrderDetails(url) {
         productName,
         totalPrice
       };
+      console.log('LOG: Datos extraídos dentro de evaluate:', extractedData);
+      return extractedData;
     });
 
     await browser.close();
+    console.log('LOG: Navegador cerrado.');
+    console.log('LOG: Datos finales a retornar:', orderDetails);
     return orderDetails;
 
   } catch (err) {
-    console.error('Error durante el scraping:', err);
+    console.error('LOG: Error durante el scraping:', err);
     throw new Error('Error en el scraping');
   }
 }
