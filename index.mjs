@@ -1,8 +1,8 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
+import puppeteer from 'puppeteer';
+import fs from 'fs';
 
 // Cargar las cookies desde un archivo JSON
-const cookies = require('./cookies.json');
+import cookies from './cookies.json' assert { type: 'json' };
 
 // Función para hacer scraping de los detalles del pedido
 async function scrapeOrderDetails(url) {
