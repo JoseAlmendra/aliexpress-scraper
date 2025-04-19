@@ -28,9 +28,15 @@ async function scrapeOrderDetails(url) {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     console.log('LOG: Navegación completada (domcontentloaded).');
 
-    // Esperar un poco más por si acaso hay carga dinámica
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    console.log('LOG: Espera adicional de 3 segundos completada (con setTimeout).');
+    console.log('LOG: Esperando selectores clave.');
+    try {
+      await page.waitForSelector('.order-detail-info-item.order-detail-order-info', { timeout: 5000 });
+      await page.waitForSelector('.order-price .order-price-item', { timeout: 5000 });
+      console.log('LOG: Selectores clave cargados. Iniciando extracción.');
+    } catch (error) {
+      console.error('LOG: Error al esperar selectores clave:', error);
+      console.log('LOG: Intentando extraer con los elementos cargados hasta ahora.');
+    }
 
     const extractionResult = await page.evaluate(() => {
       console.log('LOG: Dentro de page.evaluate().');
@@ -38,7 +44,6 @@ async function scrapeOrderDetails(url) {
         const orderInfoBlock = document.querySelector('.order-detail-info-item.order-detail-order-info .order-detail-info-content');
         console.log('LOG: orderInfoBlock encontrado:', !!orderInfoBlock);
 
-        // Número de pedido
         let orderNumber = 'No order number found';
         const orderIdLabel = orderInfoBlock?.querySelector('.info-row:first-child > span[data-pl="order_detail_gray_id"]');
         console.log('LOG: orderIdLabel encontrado:', !!orderIdLabel, 'Texto:', orderIdLabel?.textContent);
@@ -47,7 +52,6 @@ async function scrapeOrderDetails(url) {
           console.log('LOG: orderNumber extraído:', orderNumber);
         }
 
-        // Fecha del pedido
         let orderDate = 'No order date found';
         const orderDateLabel = orderInfoBlock?.querySelector('.info-row:nth-child(2) > span[data-pl="order_detail_gray_date"]');
         console.log('LOG: orderDateLabel encontrado:', !!orderDateLabel, 'Texto:', orderDateLabel?.textContent);
@@ -69,19 +73,21 @@ async function scrapeOrderDetails(url) {
         console.log('LOG: productName encontrado:', productName);
 
         // Precio total (maneja el caso de spans individuales)
-    let totalPrice = 'No total price found';
-    const totalPriceContainer = document.querySelector('.order-price .order-price-item .rightPriceClass .es--wrap--1Hlfkoj');
-    if (totalPriceContainer) {
-      totalPrice = Array.from(totalPriceContainer.children)
-        .map(span => span.innerText)
-        .join('');
-      totalPrice = totalPriceContainer.innerText; // Intenta con el texto del contenedor también como respaldo
-      console.log('LOG: totalPrice extraído (con spans):', totalPrice);
-    } else {
-      const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass');
-      totalPrice = totalPriceElement?.innerText?.trim() || 'No total price found';
-      console.log('LOG: totalPrice extraído (sin spans):', totalPrice);
-    }
+        let totalPrice = 'No total price found';
+        const totalPriceContainer = document.querySelector('.order-price .order-price-item .rightPriceClass .es--wrap--1Hlfkoj');
+        if (totalPriceContainer) {
+          totalPrice = Array.from(totalPriceContainer.children)
+            .map(span => span.innerText)
+            .join('');
+          console.log('LOG: totalPrice extraído (con spans):', totalPrice);
+        } else {
+          const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass');
+          totalPrice = totalPriceElement?.innerText?.trim() || 'No total price found';
+          console.log('LOG: totalPrice extraído (sin spans):', totalPrice);
+        }
+
+        const html = document.body.innerHTML;
+        console.log('LOG: HTML del body extraído.');
 
         const extractedData = {
           orderNumber,
@@ -92,7 +98,7 @@ async function scrapeOrderDetails(url) {
           totalPrice
         };
         console.log('LOG: Datos extraídos dentro de evaluate:', extractedData);
-        return { data: extractedData};
+        return { data: extractedData, html };
       } catch (error) {
         console.error('LOG: Error dentro de page.evaluate():', error);
         return {
