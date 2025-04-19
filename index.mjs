@@ -65,7 +65,8 @@ async function scrapeOrderDetails(url) {
         console.log('LOG: storeName encontrado:', storeName);
 
         const productImageElement = document.querySelector('.order-detail-item-content-img');
-        const productImage = productImageElement?.style.backgroundImage?.slice(4, -2)?.replace(/(_\d+x\d+\.jpg)?$/, '') || 'No product image found';
+        let productImage = productImageElement?.style.backgroundImage?.slice(4, -2)?.replace(/(_\d+x\d+\.jpg)?$/, '') || 'No product image found';
+        productImage = productImage.replace(/^"|"$/g, ''); // Elimina las comillas dobles al principio y al final
         console.log('LOG: productImage encontrado:', productImage);
 
         const productNameElement = document.querySelector('.order-detail-item-content-info .item-title a');
