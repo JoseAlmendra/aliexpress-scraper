@@ -36,21 +36,27 @@ async function scrapeOrderDetails(url) {
 
       const orderInfoBlock = document.querySelector('.order-detail-info-item.order-detail-order-info');
 
-      // Número de pedido (buscando el span con el texto)
+      // Número de pedido (accediendo al siguiente nodo de texto)
   let orderNumber = 'No order number found';
-  const orderNumberLabel = orderInfoBlock?.querySelector('.info-row > span[data-pl="order_detail_gray_id"]');
+  const orderNumberLabel = orderInfoBlock?.querySelector('.info-row:first-child > span[data-pl="order_detail_gray_id"]');
   if (orderNumberLabel?.textContent.includes('Nº de pedido:')) {
-    orderNumber = orderNumberLabel.nextElementSibling?.textContent?.trim() || 'No order number found';
+    orderNumber = orderNumberLabel.nextSibling?.textContent?.trim();
+    if (!orderNumber) {
+      orderNumber = 'No order number found';
+    }
   }
-  console.log('LOG: orderNumber extraído (refinado):', orderNumber);
+  console.log('LOG: orderNumber extraído (texto directo):', orderNumber);
 
-  // Fecha del pedido (buscando el span con el texto)
+  // Fecha del pedido (accediendo al siguiente nodo de texto)
   let orderDate = 'No order date found';
-  const orderDateLabel = orderInfoBlock?.querySelector('.info-row > span[data-pl="order_detail_gray_date"]');
+  const orderDateLabel = orderInfoBlock?.querySelector('.info-row:nth-child(2) > span[data-pl="order_detail_gray_date"]');
   if (orderDateLabel?.textContent.includes('Pedido efectuado el:')) {
-    orderDate = orderDateLabel.nextElementSibling?.textContent?.trim() || 'No order date found';
+    orderDate = orderDateLabel.nextSibling?.textContent?.trim();
+    if (!orderDate) {
+      orderDate = 'No order date found';
+    }
   }
-  console.log('LOG: orderDate extraído (refinado):', orderDate);
+  console.log('LOG: orderDate extraído (texto directo):', orderDate);
 
       const storeNameElement = document.querySelector('.order-detail-item-store .store-name');
       const storeName = storeNameElement?.innerText.trim() || 'No store name found';
