@@ -26,8 +26,10 @@ async function scrapeOrderDetails(url) {
     console.log('LOG: Navegación completada (domcontentloaded).');
 
     // Esperar un poco más por si acaso hay carga dinámica
-    await page.waitForTimeout(3000); // Espera 3 segundos
-    console.log('LOG: Espera adicional de 3 segundos completada.');
+    //await page.waitForTimeout(3000); // Espera 3 segundos
+    //console.log('LOG: Espera adicional de 3 segundos completada.');
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    console.log('LOG: Espera adicional de 3 segundos completada (con setTimeout).');
 
     const orderDetails = await page.evaluate(() => {
       console.log('LOG: Dentro de page.evaluate().');
