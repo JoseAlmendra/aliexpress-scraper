@@ -80,10 +80,11 @@ async function scrapeOrderDetails(url) {
           totalPrice = Array.from(totalPriceContainer.children)
             .map(span => span.innerText)
             .join('');
+          totalPrice = totalPrice.replace('MX$', '').trim(); // Elimina "MX$" y espacios
           console.log('LOG: totalPrice extraído (con spans):', totalPrice);
         } else {
           const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass');
-          totalPrice = totalPriceElement?.innerText?.trim() || 'No total price found';
+          totalPrice = totalPriceElement?.innerText?.replace('MX$', '').trim() || 'No total price found'; // Elimina "MX$" y espacios
           console.log('LOG: totalPrice extraído (sin spans):', totalPrice);
         }
 
