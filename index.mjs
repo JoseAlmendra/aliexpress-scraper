@@ -5,7 +5,7 @@ import express from 'express';
 const app = express();
 app.use(express.json());
 
-// Cargar las cookies desde un archivo JSON (método más estándar)
+// Cargar las cookies desde un archivo JSON
 const cookies = JSON.parse(fs.readFileSync('./cookies.json', 'utf-8'));
 
 // Función para hacer scraping de los detalles del pedido
@@ -17,8 +17,11 @@ async function scrapeOrderDetails(url) {
     });
     const page = await browser.newPage();
 
-    // Cargar las cookies para mantener la sesión activa
-    await page.setCookie(...cookies);
+    // Filtrar las cookies que tienen sameSite como null
+    const validCookies = cookies.filter(cookie => cookie.sameSite !== null);
+
+    // Cargar las cookies válidas para mantener la sesión activa
+    await page.setCookie(...validCookies);
 
     // Navegar al URL del pedido
     await page.goto(url, { waitUntil: 'domcontentloaded' });
