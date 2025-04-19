@@ -7,83 +7,100 @@ app.use(express.json());
 
 // Cargar las cookies desde un archivo JSON
 const cookies = JSON.parse(fs.readFileSync('./cookies.json', 'utf-8'));
+console.log('LOG: Cookies cargadas del archivo.');
 
 // Función para hacer scraping de los detalles del pedido
 async function scrapeOrderDetails(url) {
   try {
+    console.log('LOG: Iniciando scrapeOrderDetails para la URL:', url);
     const browser = await puppeteer.launch({
       headless: true, // Si no quieres que el navegador sea visible
       args: ['--no-sandbox', '--disable-setuid-sandbox'], // Esto resuelve el problema de root
     });
     const page = await browser.newPage();
+    console.log('LOG: Nuevo navegador y página creados.');
 
     const validCookies = cookies.filter(cookie => cookie.sameSite !== null);
     await page.setCookie(...validCookies);
-    console.log('LOG: Cookies establecidas.');
+    console.log('LOG: Cookies establecidas en la página.');
 
-    console.log(`LOG: Navegando a la URL: ${url}`);
+    console.log('LOG: Navegando a la URL:', url);
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     console.log('LOG: Navegación completada (domcontentloaded).');
 
     // Esperar un poco más por si acaso hay carga dinámica
-    //await page.waitForTimeout(3000); // Espera 3 segundos
-    //console.log('LOG: Espera adicional de 3 segundos completada.');
     await new Promise(resolve => setTimeout(resolve, 3000));
     console.log('LOG: Espera adicional de 3 segundos completada (con setTimeout).');
 
     const orderDetails = await page.evaluate(() => {
       console.log('LOG: Dentro de page.evaluate().');
+      try {
+        const orderInfoBlock = document.querySelector('.order-detail-info-item.order-detail-order-info .order-detail-info-content');
+        console.log('LOG: orderInfoBlock encontrado:', !!orderInfoBlock);
 
-      const orderInfoBlock = document.querySelector('.order-detail-info-item.order-detail-order-info');
+        // Número de pedido (accediendo al siguiente nodo de texto)
+        let orderNumber = 'No order number found';
+        const orderNumberLabel = orderInfoBlock?.querySelector('.info-row:first-child > span[data-pl="order_detail_gray_id"]');
+        console.log('LOG: orderNumberLabel encontrado:', !!orderNumberLabel, 'Texto:', orderNumberLabel?.textContent);
+        if (orderNumberLabel?.textContent.includes('Nº de pedido:')) {
+          orderNumber = orderNumberLabel.nextSibling?.textContent?.trim();
+          console.log('LOG: orderNumber nodo de texto siguiente:', orderNumber);
+          if (!orderNumber) {
+            orderNumber = 'No order number found';
+          }
+        }
+        console.log('LOG: orderNumber extraído (texto directo):', orderNumber);
 
-      // Número de pedido (accediendo al siguiente nodo de texto)
-  let orderNumber = 'No order number found';
-  const orderNumberLabel = orderInfoBlock?.querySelector('.info-row:first-child > span[data-pl="order_detail_gray_id"]');
-  if (orderNumberLabel?.textContent.includes('Nº de pedido:')) {
-    orderNumber = orderNumberLabel.nextSibling?.textContent?.trim();
-    if (!orderNumber) {
-      orderNumber = 'No order number found';
-    }
-  }
-  console.log('LOG: orderNumber extraído (texto directo):', orderNumber);
+        // Fecha del pedido (accediendo al siguiente nodo de texto)
+        let orderDate = 'No order date found';
+        const orderDateLabel = orderInfoBlock?.querySelector('.info-row:nth-child(2) > span[data-pl="order_detail_gray_date"]');
+        console.log('LOG: orderDateLabel encontrado:', !!orderDateLabel, 'Texto:', orderDateLabel?.textContent);
+        if (orderDateLabel?.textContent.includes('Pedido efectuado el:')) {
+          orderDate = orderDateLabel.nextSibling?.textContent?.trim();
+          console.log('LOG: orderDate nodo de texto siguiente:', orderDate);
+          if (!orderDate) {
+            orderDate = 'No order date found';
+          }
+        }
+        console.log('LOG: orderDate extraído (texto directo):', orderDate);
 
-  // Fecha del pedido (accediendo al siguiente nodo de texto)
-  let orderDate = 'No order date found';
-  const orderDateLabel = orderInfoBlock?.querySelector('.info-row:nth-child(2) > span[data-pl="order_detail_gray_date"]');
-  if (orderDateLabel?.textContent.includes('Pedido efectuado el:')) {
-    orderDate = orderDateLabel.nextSibling?.textContent?.trim();
-    if (!orderDate) {
-      orderDate = 'No order date found';
-    }
-  }
-  console.log('LOG: orderDate extraído (texto directo):', orderDate);
+        const storeNameElement = document.querySelector('.order-detail-item-store .store-name');
+        const storeName = storeNameElement?.innerText?.trim() || 'No store name found';
+        console.log('LOG: storeName encontrado:', storeName);
 
-      const storeNameElement = document.querySelector('.order-detail-item-store .store-name');
-      const storeName = storeNameElement?.innerText.trim() || 'No store name found';
-      console.log('LOG: storeName encontrado:', storeName);
+        const productImageElement = document.querySelector('.order-detail-item-content-img');
+        const productImage = productImageElement?.style.backgroundImage?.slice(4, -2)?.replace(/(_\d+x\d+\.jpg)?$/, '') || 'No product image found';
+        console.log('LOG: productImage encontrado:', productImage);
 
-      const productImageElement = document.querySelector('.order-detail-item-content-img');
-      const productImage = productImageElement?.style.backgroundImage.slice(4, -2).replace(/_220x220\.jpg/, '') || 'No product image found';
-      console.log('LOG: productImage encontrado:', productImage);
+        const productNameElement = document.querySelector('.order-detail-item-content-info .item-title a');
+        const productName = productNameElement?.innerText?.trim() || 'No product name found';
+        console.log('LOG: productName encontrado:', productName);
 
-      const productNameElement = document.querySelector('.order-detail-item-content-info .item-title a');
-      const productName = productNameElement?.innerText.trim() || 'No product name found';
-      console.log('LOG: productName encontrado:', productName);
+        const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass .es--wrap--1Hlfkoj');
+        const totalPrice = totalPriceElement?.innerText?.trim() || 'No total price found';
+        console.log('LOG: totalPrice encontrado:', totalPrice);
 
-      const totalPriceElement = document.querySelector('.order-price .order-price-item.bold-font .rightPriceClass .es--wrap--1Hlfkoj');
-      const totalPrice = totalPriceElement?.innerText.trim() || 'No total price found';
-      console.log('LOG: totalPrice encontrado:', totalPrice);
-
-      const extractedData = {
-        orderNumber,
-        orderDate,
-        storeName,
-        productImage,
-        productName,
-        totalPrice
-      };
-      console.log('LOG: Datos extraídos dentro de evaluate:', extractedData);
-      return extractedData;
+        const extractedData = {
+          orderNumber,
+          orderDate,
+          storeName,
+          productImage,
+          productName,
+          totalPrice
+        };
+        console.log('LOG: Datos extraídos dentro de evaluate:', extractedData);
+        return extractedData;
+      } catch (error) {
+        console.error('LOG: Error dentro de page.evaluate():', error);
+        return {
+          orderNumber: 'Error during extraction',
+          orderDate: 'Error during extraction',
+          storeName: 'Error during extraction',
+          productImage: 'Error during extraction',
+          productName: 'Error during extraction',
+          totalPrice: 'Error during extraction'
+        };
+      }
     });
 
     await browser.close();
